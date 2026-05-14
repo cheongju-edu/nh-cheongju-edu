@@ -31,6 +31,7 @@ meal_dinner: '',
         checkout_img_3: '',
         checkout_img_4: '',
         checkout_checklist: '',
+        course_list: '',
         outing_start_time: '18:00',
         outing_end_time: '22:55'
     });
@@ -506,7 +507,37 @@ meal_dinner: '',
                     </div>
                 </div>
             </div>
+{/* 과정 목록 관리 */}
+<div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <h2 className="text-xl font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">
+        📚 과정 목록 관리
+    </h2>
 
+    <div>
+        <label className="block text-sm font-medium text-gray-700">
+            과정명 목록
+        </label>
+
+        <p className="text-xs text-gray-500 mb-2">
+            한 줄에 하나씩 입력하세요.
+        </p>
+
+        <textarea
+            className="mt-1 block w-full border border-gray-300 rounded-md p-3"
+            rows="6"
+            value={settings.course_list || ''}
+            onChange={(e) =>
+                setSettings({
+                    ...settings,
+                    course_list: e.target.value
+                })
+            }
+            placeholder={`예:농협신입직원과정
+금융마케팅과정
+하나로리더과정`}
+        />
+    </div>
+</div>
             {/* 퇴실 안내 설정 */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">퇴실 안내 설정</h2>
