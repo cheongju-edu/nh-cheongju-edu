@@ -370,8 +370,19 @@ const Outing = () => {
                                             <span className={`text-xs px-1.5 py-0.5 rounded ${item.type === '외박' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
                                                 {item.type}
                                             </span>
-                                            <span className="font-bold text-gray-800">{item.name}</span>
-                                            <span className="text-sm text-gray-500">({item.student_id})</span>
+                                           <div className="flex flex-col">
+    <span className="text-xs text-nh-blue font-medium">
+        {item.course_name}
+    </span>
+
+    <span className="font-bold text-gray-800">
+        {item.name}
+
+        <span className="text-sm text-gray-500 ml-1">
+            ({item.student_id})
+        </span>
+    </span>
+</div>
                                         </div>
                                         <div className="text-xs text-gray-500">
                                             <span className="mr-2">📍 {item.destination}</span>
