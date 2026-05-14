@@ -17,7 +17,9 @@ const Admin = () => {
         facility_info_6: '',
         facility_info_7: '',
         facility_info_8: '',
-        meal_schedule: '',
+        meal_breakfast: '',
+meal_lunch: '',
+meal_dinner: '',
         meal_guide: '',
         complaint_info: '',
         rest_rules: '',
@@ -341,14 +343,66 @@ const Admin = () => {
                             onChange={(e) => setSettings({ ...settings, meal_schedule: e.target.value })}
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">식사 가이드</label>
-                        <textarea
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            value={settings.meal_guide || ''}
-                            onChange={(e) => setSettings({ ...settings, meal_guide: e.target.value })}
-                        />
-                    </div>
+                   <div className="space-y-4">
+
+    <div>
+        <label className="block text-sm font-medium text-gray-700">
+            🍳 조식 시간
+        </label>
+
+        <input
+            type="text"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            value={settings.meal_breakfast || ''}
+            onChange={(e) =>
+                setSettings({
+                    ...settings,
+                    meal_breakfast: e.target.value
+                })
+            }
+            placeholder="07:00 ~ 08:30"
+        />
+    </div>
+
+    <div>
+        <label className="block text-sm font-medium text-gray-700">
+            🍱 중식 시간
+        </label>
+
+        <input
+            type="text"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            value={settings.meal_lunch || ''}
+            onChange={(e) =>
+                setSettings({
+                    ...settings,
+                    meal_lunch: e.target.value
+                })
+            }
+            placeholder="11:30 ~ 13:00"
+        />
+    </div>
+
+    <div>
+        <label className="block text-sm font-medium text-gray-700">
+            🍽 석식 시간
+        </label>
+
+        <input
+            type="text"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            value={settings.meal_dinner || ''}
+            onChange={(e) =>
+                setSettings({
+                    ...settings,
+                    meal_dinner: e.target.value
+                })
+            }
+            placeholder="17:30 ~ 19:00"
+        />
+    </div>
+
+</div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">불편사항 접수</label>
                         <textarea
