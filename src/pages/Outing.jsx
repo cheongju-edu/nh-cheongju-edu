@@ -182,7 +182,13 @@ const Outing = () => {
             setCurrentRequestId(data.id);
             setCurrentRequestData(data);
 
-            setFormData({ ...formData, type: '외출', destination: '' });
+           setFormData({
+    course_name: '',
+    studentId: '',
+    name: '',
+    type: '외출',
+    destination: ''
+});
             alert('신청이 완료되었습니다.');
         } catch (error) {
             console.error("Error adding document: ", error);
@@ -405,6 +411,35 @@ const Outing = () => {
                                 신청서 작성
                             </h3>
                             <form onSubmit={handleSubmit} className="space-y-4">
+                                <div>
+    <label className="block text-xs text-gray-500 mb-1">
+        과정 선택
+    </label>
+
+    <select
+        value={formData.course_name}
+        onChange={(e) =>
+            setFormData({
+                ...formData,
+                course_name: e.target.value
+            })
+        }
+        className="w-full p-2 border border-gray-200 rounded focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none transition-colors bg-white"
+    >
+        <option value="">
+            과정 선택
+        </option>
+
+        {(settings?.course_list || '')
+            .split('\n')
+            .filter(Boolean)
+            .map((course, idx) => (
+                <option key={idx} value={course}>
+                    {course}
+                </option>
+            ))}
+    </select>
+</div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
                                         <label className="block text-xs text-gray-500 mb-1">교번</label>
