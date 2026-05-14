@@ -62,6 +62,74 @@ meal_dinner: '',
     }
 
     async function updateSettings() {
+        async function downloadStayRequests() {
+    const { data, error } = await supabase
+        .from('stay_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        alert('데이터 다운로드 실패');
+        console.error(error);
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        alert('신청 데이터가 없습니다.');
+        return;
+    }
+
+    // CSV 헤더
+    const headers = [
+        '신청일시',
+        '이름',
+        '학번',
+        '전화번호',
+        '구분',
+        '목적지',
+        '사유',
+        '출발일',
+        '복귀일',
+        '상태'
+    ];
+
+    // CSV 내용 생성
+    const rows = data.map(item => [
+        item.created_at || '',
+        item.name || '',
+        item.student_id || '',
+        item.phone_number || '',
+        item.type || '',
+        item.destination || '',
+        item.reason || '',
+        item.start_date || '',
+        item.end_date || '',
+        item.status || ''
+    ]);
+
+    const csvContent = [
+        headers.join(','),
+        ...rows.map(row =>
+            row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
+        )
+    ].join('\n');
+
+    // 다운로드 생성
+    const blob = new Blob(
+        ['\uFEFF' + csvContent],
+        { type: 'text/csv;charset=utf-8;' }
+    );
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `외출외박신청_${new Date().toISOString().slice(0,10)}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
         setIsSaving(true);
         let finalBgImageUrl = settings.bg_image_url;
 
@@ -492,6 +560,12 @@ meal_dinner: '',
 
             <button
                 onClick={updateSettings}
+<button
+    onClick={downloadStayRequests}
+    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-md transition shadow-md mt-4"
+>
+    📥 외출/외박 신청자 엑셀 다운로드
+</button>
                 disabled={isSaving}
                 className={`w-full font-bold py-3 rounded-md transition text-white shadow-md ${isSaving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'}`}
             >
