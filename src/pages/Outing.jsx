@@ -17,12 +17,14 @@ const Outing = () => {
     const [currentRequestData, setCurrentRequestData] = useState(null);
 
     // Form State
-    const [formData, setFormData] = useState({
-        studentId: '',
-        name: '',
-        type: '외출', // 외출 or 외박
-        destination: ''
-    });
+ const [formData, setFormData] = useState({
+    course_name: '',
+
+    studentId: '',
+    name: '',
+    type: '외출',
+    destination: ''
+});
 
     const [outings, setOutings] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -144,7 +146,12 @@ const Outing = () => {
             return;
         }
 
-        if (!formData.studentId || !formData.name || !formData.destination) {
+ if (
+    !formData.course_name ||
+    !formData.studentId ||
+    !formData.name ||
+    !formData.destination
+)
             alert('모든 항목을 입력해주세요.');
             return;
         }
@@ -154,15 +161,17 @@ const Outing = () => {
 
             const { data, error } = await supabase
                 .from('stay_requests')
-                .insert([
-                    {
-                        student_id: formData.studentId,
-                        name: formData.name,
-                        type: formData.type,
-                        destination: formData.destination,
-                        status: 'active'
-                    }
-                ])
+               .insert([
+    {
+        course_name: formData.course_name,
+
+        student_id: formData.studentId,
+        name: formData.name,
+        type: formData.type,
+        destination: formData.destination,
+        status: 'active'
+    }
+])
                 .select()
                 .single();
 
