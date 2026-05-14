@@ -335,14 +335,7 @@ meal_dinner: '',
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">생활안내 설정</h2>
                 <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">식사 시간표</label>
-                        <textarea
-                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                            value={settings.meal_schedule || ''}
-                            onChange={(e) => setSettings({ ...settings, meal_schedule: e.target.value })}
-                        />
-                    </div>
+                   
                    <div className="space-y-4">
 
     <div>
@@ -360,7 +353,7 @@ meal_dinner: '',
                     meal_breakfast: e.target.value
                 })
             }
-            placeholder="07:00 ~ 08:30"
+            placeholder="예:07:00 ~ 08:30"
         />
     </div>
 
@@ -379,7 +372,7 @@ meal_dinner: '',
                     meal_lunch: e.target.value
                 })
             }
-            placeholder="11:30 ~ 13:00"
+            placeholder="예:11:30 ~ 13:00"
         />
     </div>
 
@@ -398,7 +391,7 @@ meal_dinner: '',
                     meal_dinner: e.target.value
                 })
             }
-            placeholder="17:30 ~ 19:00"
+            placeholder="예:17:30 ~ 19:00"
         />
     </div>
 
