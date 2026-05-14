@@ -21,15 +21,79 @@ const LifeGuide = () => {
 
     return (
         <div className="space-y-8">
-            {/* Meal Time */}
-            <section>
-                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <Utensils className="text-nh-green" /> 식사 시간표
-                </h2>
-                <div className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 whitespace-pre-wrap text-gray-700 leading-relaxed min-h-[100px]">
-                    {settings?.meal_schedule || '식사 시간표가 아직 등록되지 않았습니다.'}
+           {/* Meal Time */}
+<section>
+    <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <Utensils className="text-nh-green" /> 식사 시간 안내
+    </h2>
+
+    <div className="grid grid-cols-1 gap-4">
+
+        {/* 조식 */}
+        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-100 rounded-2xl p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+
+                <div>
+                    <p className="text-sm font-medium text-yellow-700">
+                        조식
+                    </p>
+
+                    <p className="text-2xl font-bold text-gray-800 mt-1">
+                        {settings?.meal_breakfast || '07:00 ~ 08:30'}
+                    </p>
                 </div>
-            </section>
+
+                <div className="text-4xl">
+                    🍳
+                </div>
+
+            </div>
+        </div>
+
+        {/* 중식 */}
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-2xl p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+
+                <div>
+                    <p className="text-sm font-medium text-green-700">
+                        중식
+                    </p>
+
+                    <p className="text-2xl font-bold text-gray-800 mt-1">
+                        {settings?.meal_lunch || '11:30 ~ 13:00'}
+                    </p>
+                </div>
+
+                <div className="text-4xl">
+                    🍱
+                </div>
+
+            </div>
+        </div>
+
+        {/* 석식 */}
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+
+                <div>
+                    <p className="text-sm font-medium text-blue-700">
+                        석식
+                    </p>
+
+                    <p className="text-2xl font-bold text-gray-800 mt-1">
+                        {settings?.meal_dinner || '17:30 ~ 19:00'}
+                    </p>
+                </div>
+
+                <div className="text-4xl">
+                    🍽
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
 
             {/* Rules Grid */}
             <section>
