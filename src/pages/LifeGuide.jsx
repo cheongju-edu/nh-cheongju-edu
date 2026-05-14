@@ -39,7 +39,7 @@ const LifeGuide = () => {
                     </p>
 
                     <p className="text-2xl font-bold text-gray-800 mt-1">
-                        {settings?.meal_breakfast || '07:00 ~ 08:30'}
+                        {settings?.meal_breakfast || '관리자가 등록 예정입니다.'}
                     </p>
                 </div>
 
@@ -60,7 +60,7 @@ const LifeGuide = () => {
                     </p>
 
                     <p className="text-2xl font-bold text-gray-800 mt-1">
-                        {settings?.meal_lunch || '11:30 ~ 13:00'}
+                        {settings?.meal_lunch || '관리자가 등록 예정입니다.'}
                     </p>
                 </div>
 
@@ -81,7 +81,7 @@ const LifeGuide = () => {
                     </p>
 
                     <p className="text-2xl font-bold text-gray-800 mt-1">
-                        {settings?.meal_dinner || '17:30 ~ 19:00'}
+                        {settings?.meal_dinner || '관리자가 등록 예정입니다.'}
                     </p>
                 </div>
 
