@@ -162,15 +162,16 @@ const Outing = () => {
             const { data, error } = await supabase
                 .from('stay_requests')
                .insert([
-    {
-        course_name: formData.course_name,
+{
+    course_name: formData.course_name,
 
-        student_id: formData.studentId,
-        name: formData.name,
-        type: formData.type,
-        destination: formData.destination,
-        status: 'active'
-    }
+    student_id: formData.studentId,
+    name: formData.name,
+    type: formData.type,
+    destination: formData.destination,
+    return_time: formData.returnTime,
+    status: 'active'
+}
 ])
                 .select()
                 .single();
@@ -182,12 +183,13 @@ const Outing = () => {
             setCurrentRequestId(data.id);
             setCurrentRequestData(data);
 
-           setFormData({
+      setFormData({
     course_name: '',
     studentId: '',
     name: '',
     type: '외출',
-    destination: ''
+    destination: '',
+    returnTime: ''
 });
             alert('신청이 완료되었습니다.');
         } catch (error) {
