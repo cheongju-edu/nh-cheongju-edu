@@ -637,7 +637,7 @@ async function downloadStayRequests() {
             ? '이미지 업로드 및 설정 저장 중...'
             : '설정 저장하기'}
     </button>
-
+</div>
 </div>
     );
 };
