@@ -61,6 +61,145 @@ meal_dinner: '',
             setLoading(false);
         }
     }
+
+async function updateSettings() {
+    try {
+        setIsSaving(true);
+
+        let finalBgImageUrl = settings.bg_image_url;
+
+        // 배경 이미지 업로드
+        if (imageFile) {
+            const fileExt = imageFile.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `backgrounds/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('images')
+                .upload(filePath, imageFile);
+
+            if (uploadError) {
+                console.error(uploadError);
+                alert('이미지 업로드 실패');
+                return;
+            }
+
+            const {
+                data: { publicUrl }
+            } = supabase.storage
+                .from('images')
+                .getPublicUrl(filePath);
+
+            finalBgImageUrl = publicUrl;
+        }
+
+        // 시설안내 이미지 업로드
+        let finalFacilityMapUrl = settings.facility_map_url;
+
+        if (facilityMapFile) {
+            const fileExt = facilityMapFile.name.split('.').pop();
+            const fileName = `map_${Math.random()}.${fileExt}`;
+            const filePath = `backgrounds/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('images')
+                .upload(filePath, facilityMapFile);
+
+            if (uploadError) {
+                console.error(uploadError);
+                alert('조감도 업로드 실패');
+                return;
+            }
+
+            const {
+                data: { publicUrl }
+            } = supabase.storage
+                .from('images')
+                .getPublicUrl(filePath);
+
+            finalFacilityMapUrl = publicUrl;
+        }
+
+        // 퇴실 이미지 업로드
+        let finalCheckoutImgUrls = [
+            settings.checkout_img_1,
+            settings.checkout_img_2,
+            settings.checkout_img_3,
+            settings.checkout_img_4
+        ];
+
+        for (let i = 0; i < 4; i++) {
+            if (checkoutImgFiles[i]) {
+                const fileExt = checkoutImgFiles[i].name.split('.').pop();
+                const fileName = `checkout_${i}_${Math.random()}.${fileExt}`;
+                const filePath = `backgrounds/${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('images')
+                    .upload(filePath, checkoutImgFiles[i]);
+
+                if (uploadError) {
+                    console.error(uploadError);
+                    alert(`퇴실안내 이미지 ${i + 1} 업로드 실패`);
+                    return;
+                }
+
+                const {
+                    data: { publicUrl }
+                } = supabase.storage
+                    .from('images')
+                    .getPublicUrl(filePath);
+
+                finalCheckoutImgUrls[i] = publicUrl;
+            }
+        }
+
+        // 저장 데이터 정리
+        const {
+            id,
+            checkout_info,
+            facility_info,
+            ...dataToSave
+        } = settings;
+
+        const payload = {
+            ...dataToSave,
+            bg_image_url: finalBgImageUrl,
+            facility_map_url: finalFacilityMapUrl,
+            checkout_img_1: finalCheckoutImgUrls[0],
+            checkout_img_2: finalCheckoutImgUrls[1],
+            checkout_img_3: finalCheckoutImgUrls[2],
+            checkout_img_4: finalCheckoutImgUrls[3]
+        };
+
+        const { error } = await supabase
+            .from('site_settings')
+            .update(payload)
+            .eq('id', 1);
+
+        if (error) {
+            console.error(error);
+            alert('저장 실패');
+            return;
+        }
+
+        setSettings({
+            id: 1,
+            ...payload
+        });
+
+        setImageFile(null);
+        setFacilityMapFile(null);
+        setCheckoutImgFiles([null, null, null, null]);
+
+        alert('성공적으로 저장되었습니다!');
+    } catch (error) {
+        console.error(error);
+        alert('저장 중 오류 발생');
+    } finally {
+        setIsSaving(false);
+    }
+}
 async function downloadStayRequests() {
  
     const { data, error } = await supabase
