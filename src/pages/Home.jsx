@@ -84,7 +84,6 @@ const Home = () => {
                         to="/suggestions"
                         color="bg-pink-500"
                     />
-*/}
                 </div>
             </div>
         </div>
