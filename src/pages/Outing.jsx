@@ -24,6 +24,7 @@ const Outing = () => {
     name: '',
     type: '외출',
     destination: ''
+     return_time: ''
 });
 
     const [outings, setOutings] = useState([]);
