@@ -103,50 +103,6 @@ const Suggestions = () => {
         }
     };
 
-   
-
-    // Handle Reply Submit
-    const handleReplySubmit = async () => {
-        if (!replyContent.trim()) {
-            alert('답변 내용을 입력해주세요.');
-            return;
-        }
-
-        setIsSubmittingReply(true);
-        try {
-            const { error } = await supabase
-                .from('suggestions')
-                .update({
-                    admin_reply: replyContent,
-                    admin_reply_created_at: new Date().toISOString()
-                })
-                .eq('id', selectedPost.id);
-
-            if (error) throw error;
-
-            alert('답변이 등록되었습니다.');
-
-            // Update local state
-            setSelectedPost({
-                ...selectedPost,
-                admin_reply: replyContent,
-                admin_reply_created_at: new Date().toISOString()
-            });
-
-            // Update list state
-            setSuggestions(suggestions.map(s =>
-                s.id === selectedPost.id
-                    ? { ...s, admin_reply: replyContent, admin_reply_created_at: new Date().toISOString() }
-                    : s
-            ));
-
-        } catch (error) {
-            console.error("Error submitting reply:", error);
-            alert('답변 등록 중 오류가 발생했습니다.');
-        } finally {
-            setIsSubmittingReply(false);
-        }
-    };
 const handleDelete = async (id) => {
     if (!window.confirm('게시글을 삭제하시겠습니까?')) return;
 
