@@ -589,20 +589,30 @@ meal_dinner: '',
                 </div>
             </div>
 
-            <button
-                onClick={updateSettings}
-<button
-    onClick={downloadStayRequests}
-    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-md transition shadow-md mt-4"
->
-    📥 외출/외박 신청자 엑셀 다운로드
-</button>
-                disabled={isSaving}
-                className={`w-full font-bold py-3 rounded-md transition text-white shadow-md ${isSaving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'}`}
-            >
-                {isSaving ? '이미지 업로드 및 설정 저장 중...' : '설정 저장하기'}
-            </button>
-        </div>
+         <div className="space-y-3">
+
+    <button
+        onClick={downloadStayRequests}
+        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-md transition shadow-md mt-4"
+    >
+        📥 외출/외박 신청자 엑셀 다운로드
+    </button>
+
+    <button
+        onClick={updateSettings}
+        disabled={isSaving}
+        className={`w-full font-bold py-3 rounded-md transition text-white shadow-md ${
+            isSaving
+                ? 'bg-blue-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'
+        }`}
+    >
+        {isSaving
+            ? '이미지 업로드 및 설정 저장 중...'
+            : '설정 저장하기'}
+    </button>
+
+</div>
     );
 };
 
