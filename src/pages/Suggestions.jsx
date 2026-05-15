@@ -210,19 +210,7 @@ const handleDelete = async (id) => {
                 </div>
             </div>
 
-            {/* Admin Controls */}
-            {isAdmin && view === 'list' && (
-                <div className="bg-red-50 border border-red-200 p-3 rounded-lg flex justify-between items-center mb-4">
-                    <span className="font-bold text-red-700 text-sm">관리자 모드</span>
-                    <button
-                        onClick={handleReset}
-                        className="flex items-center gap-1 bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-xs font-bold"
-                    >
-                        <RefreshCw size={14} />
-                        게시판 초기화
-                    </button>
-                </div>
-            )}
+           
 
             {/* List View */}
             {view === 'list' && (
@@ -407,6 +395,15 @@ const handleDelete = async (id) => {
                             )}
                         </div>
                     )}
+                    {isAdmin && (
+    <button
+        onClick={() => handleDelete(selectedPost.id)}
+        className="w-full bg-red-600 text-white py-2.5 rounded-lg font-bold hover:bg-red-700 flex items-center justify-center gap-2"
+    >
+        <Trash2 size={18} />
+        게시글 삭제
+    </button>
+)}
                     <button
                         onClick={() => setView('list')}
                         className="w-full border border-gray-300 text-gray-600 py-2.5 rounded-lg font-medium hover:bg-gray-50"
