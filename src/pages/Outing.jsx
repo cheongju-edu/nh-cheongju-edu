@@ -500,7 +500,23 @@ const Outing = () => {
                                         placeholder="예: OO시 OO동"
                                     />
                                 </div>
+<div>
+    <label className="block text-xs text-gray-500 mb-1">
+        복귀시간
+    </label>
 
+    <input
+        type="datetime-local"
+        value={formData.returnTime}
+        onChange={(e) =>
+            setFormData({
+                ...formData,
+                returnTime: e.target.value
+            })
+        }
+        className="w-full p-2 border border-gray-200 rounded focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none transition-colors"
+    />
+</div>
                                 {isTimeAllowed().allowed ? (
                                     <button
                                         type="submit"
