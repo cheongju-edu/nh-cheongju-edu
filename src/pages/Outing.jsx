@@ -23,7 +23,7 @@ const Outing = () => {
     studentId: '',
     name: '',
     type: '외출',
-    destination: ''
+    destination: '',
     return_time: ''
 });
 
