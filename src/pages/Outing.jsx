@@ -311,7 +311,7 @@ const Outing = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-gray-800">
-                    {isAdmin ? '외출/외박 관리 (관리자)' : '외출/외박 신청 test123'}
+                    {isAdmin ? '외출/외박 관리 (관리자)' : '외출/외박 신청'}
                 </h2>
                 <button
                     onClick={() => isAdmin ? setIsAdmin(false) : setShowAdminLogin(!showAdminLogin)}
