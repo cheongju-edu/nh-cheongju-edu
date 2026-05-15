@@ -18,11 +18,12 @@ const Suggestions = () => {
 
     // Write Form State
     const [formData, setFormData] = useState({
-        title: '',
-        content: '',
-        isSecret: false,
-        password: ''
-    });
+    title: '',
+    content: '',
+    isSecret: false,
+    password: '',
+    attachment: null
+});
 
     // Password Prompt State
     const [inputPassword, setInputPassword] = useState('');
@@ -64,16 +65,40 @@ const Suggestions = () => {
             alert('비밀글은 비밀번호가 필수입니다.');
             return;
         }
+let attachmentUrl = null;
+let attachmentName = null;
 
+if (formData.attachment) {
+    const fileName = `${Date.now()}_${formData.attachment.name}`;
+
+    const { error: uploadError } = await supabase.storage
+        .from('notice-files')
+        .upload(fileName, formData.attachment);
+
+    if (uploadError) {
+        console.error(uploadError);
+        alert('파일 업로드 실패');
+        return;
+    }
+
+    const { data } = supabase.storage
+        .from('notice-files')
+        .getPublicUrl(fileName);
+
+    attachmentUrl = data.publicUrl;
+    attachmentName = formData.attachment.name;
+}
         try {
             const { error } = await supabase
                 .from('suggestions')
                 .insert([{
-                    title: formData.title,
-                    content: formData.content,
-                    is_secret: formData.isSecret,
-                    password: formData.isSecret ? formData.password : null
-                }]);
+    title: formData.title,
+    content: formData.content,
+    is_secret: formData.isSecret,
+    password: formData.isSecret ? formData.password : null,
+    attachment_url: attachmentUrl,
+    attachment_name: attachmentName
+}]);
 
             if (error) throw error;
 
@@ -314,6 +339,22 @@ const Suggestions = () => {
                                 className="w-full p-3 border border-gray-200 rounded-lg h-40 resize-none focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none"
                                 placeholder="내용을 입력하세요"
                             />
+                            <div>
+    <label className="block text-sm font-bold text-gray-700 mb-1">
+        첨부파일
+    </label>
+
+    <input
+        type="file"
+        onChange={(e) =>
+            setFormData({
+                ...formData,
+                attachment: e.target.files[0]
+            })
+        }
+        className="w-full p-2 border border-gray-200 rounded-lg bg-white"
+    />
+</div>
                         </div>
 
                         <div className="bg-gray-50 p-3 rounded-lg space-y-3">
@@ -370,8 +411,21 @@ const Suggestions = () => {
                         </div>
                     </div>
                     <div className="min-h-[200px] text-gray-700 whitespace-pre-wrap leading-relaxed">
-                        {selectedPost.content}
-                    </div>
+    {selectedPost.content}
+
+    {selectedPost.attachment_url && (
+        <div className="mt-4">
+            <a
+                href={selectedPost.attachment_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-blue-600 underline"
+            >
+                📎 {selectedPost.attachment_name}
+            </a>
+        </div>
+    )}
+</div>
 
                     {/* Admin Reply Section */}
                     {(selectedPost.admin_reply || isAdmin) && (
