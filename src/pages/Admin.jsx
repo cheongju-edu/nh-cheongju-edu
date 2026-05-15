@@ -219,32 +219,28 @@ async function downloadStayRequests() {
     }
 
     // CSV 헤더
-    const headers = [
-        '신청일시',
-        '이름',
-        '교번',
-        '전화번호',
-        '구분',
-        '목적지',
-        '사유',
-        '출발일',
-        '복귀일',
-        '상태'
-    ];
+   const headers = [
+    '신청일시',
+    '과정명',
+    '이름',
+    '교번',
+    '구분',
+    '목적지',
+    '복귀시간',
+    '상태'
+];
 
     // CSV 내용 생성
-    const rows = data.map(item => [
-        item.created_at || '',
-        item.name || '',
-        item.student_id || '',
-        item.phone_number || '',
-        item.type || '',
-        item.destination || '',
-        item.reason || '',
-        item.start_date || '',
-        item.end_date || '',
-        item.status || ''
-    ]);
+   const rows = data.map(item => [
+    item.created_at || '',
+    item.course || '',
+    item.name || '',
+    item.student_id || '',
+    item.type || '',
+    item.destination || '',
+    item.return_time || item.end_date || '',
+    item.status || ''
+]);
 
     const csvContent = [
         headers.join(','),
