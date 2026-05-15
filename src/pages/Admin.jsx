@@ -62,8 +62,13 @@ meal_dinner: '',
         }
     }
 
-    async function updateSettings() {
-        async function downloadStayRequests() {
+   async function downloadStayRequests() {
+   ...
+}
+
+async function updateSettings() {
+   ...
+}
     const { data, error } = await supabase
         .from('stay_requests')
         .select('*')
