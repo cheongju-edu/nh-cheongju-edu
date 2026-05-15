@@ -151,7 +151,7 @@ const Outing = () => {
     !formData.studentId ||
     !formData.name ||
     !formData.destination
-)
+) {
             alert('모든 항목을 입력해주세요.');
             return;
         }
