@@ -26,7 +26,7 @@ const Rules = () => {
     if (loading) return <Loading />;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-10">
             {settings?.life_rules ? (
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                     <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -40,24 +40,57 @@ const Rules = () => {
             ) : (
                 <>
             {/* Warning Banner */}
-            <div className="bg-red-50 border border-red-200 p-6 rounded-xl text-center">
-                <AlertTriangle className="mx-auto text-red-600 mb-2" size={40} />
-                <h2 className="text-xl font-bold text-red-700 mb-1">제17조 퇴교사유</h2>
-                <div className="text-red-600 font-medium text-sm text-left inline-block mt-2 space-y-1">
-                    <p>1. 생활성적 감점점수 10점 초과</p>
-                    <p>2. 정당한 사유 없이 수업 거부</p>
-                    <p>3. 고의로 교육질서를 문란케 한 자</p>
-                    <p>4. 무단 외박·외출한 자</p>
-                    <p>5. 도박, 절도, 폭력 행위를 한 자</p>
-                </div>
-            </div>
+<>
+    {/* 퇴교사유 */}
+    <div className="bg-[#f7f3eb]/95 backdrop-blur-sm p-6 rounded-3xl shadow-lg">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <AlertTriangle className="text-red-500" />
+            제17조 퇴교사유
+        </h2>
 
-            {/* Penalty List */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-4 bg-gray-50 border-b border-gray-100 flex items-center gap-2">
-                    <FileWarning className="text-gray-600" />
-                    <h3 className="font-bold text-gray-800">벌점 기준표</h3>
+        <div className="space-y-4">
+            {[
+                '생활성적 감점점수 10점 초과',
+                '정당한 사유 없이 수업 거부',
+                '고의로 교육질서를 문란케 한 자',
+                '무단 외박·외출한 자',
+                '도박, 절도, 폭력 행위를 한 자'
+            ].map((text, idx) => (
+                <div
+                    key={idx}
+                    className="bg-red-50 border border-red-100 rounded-2xl px-5 py-4 text-gray-700 font-medium shadow-sm"
+                >
+                    {idx + 1}. {text}
                 </div>
+            ))}
+        </div>
+    </div>
+
+    {/* 벌점 기준표 */}
+    <div className="bg-[#f7f3eb]/95 backdrop-blur-sm p-6 rounded-3xl shadow-lg">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <FileWarning className="text-red-400" />
+            벌점 기준표
+        </h2>
+
+        <div className="space-y-4">
+            {penalties.map((item, index) => (
+                <div
+                    key={index}
+                    className="bg-white rounded-2xl px-5 py-4 shadow-sm flex justify-between items-center"
+                >
+                    <span className="text-gray-700 font-medium text-sm leading-relaxed">
+                        {item.reason}
+                    </span>
+
+                    <span className="text-red-500 font-bold text-lg whitespace-nowrap">
+                        {item.point}점
+                    </span>
+                </div>
+            ))}
+        </div>
+    </div>
+</>
                 <div className="overflow-x-auto">
                     <div className="divide-y divide-gray-100 min-w-max">
                         {penalties.map((item, index) => (
