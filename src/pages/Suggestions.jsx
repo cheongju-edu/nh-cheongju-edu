@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { format } from 'date-fns';
-import { Lock, PenTool, ChevronLeft, Send, RefreshCw } from 'lucide-react';
+import { Lock, PenTool, ChevronLeft, Send, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../context/SettingsContext';
 
@@ -30,10 +30,7 @@ const Suggestions = () => {
     const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
     const [pendingPost, setPendingPost] = useState(null);
 
-    // Admin Reply State
-    const [replyContent, setReplyContent] = useState('');
-    const [isSubmittingReply, setIsSubmittingReply] = useState(false);
-
+   
     // Fetch Suggestions
     const fetchSuggestions = React.useCallback(async () => {
         setLoading(true);
@@ -55,62 +52,7 @@ const Suggestions = () => {
     }, [fetchSuggestions]);
 
     // Handle Write Submit
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!formData.title || !formData.content) {
-            alert('제목과 내용을 입력해주세요.');
-            return;
-        }
-        if (formData.isSecret && !formData.password) {
-            alert('비밀글은 비밀번호가 필수입니다.');
-            return;
-        }
-let attachmentUrl = null;
-let attachmentName = null;
 
-if (formData.attachment) {
-    const fileName = `${Date.now()}_${formData.attachment.name}`;
-
-    const { error: uploadError } = await supabase.storage
-        .from('notice-files')
-        .upload(fileName, formData.attachment);
-
-    if (uploadError) {
-        console.error(uploadError);
-        alert('파일 업로드 실패');
-        return;
-    }
-
-    const { data } = supabase.storage
-        .from('notice-files')
-        .getPublicUrl(fileName);
-
-    attachmentUrl = data.publicUrl;
-    attachmentName = formData.attachment.name;
-}
-        try {
-            const { error } = await supabase
-                .from('suggestions')
-                .insert([{
-    title: formData.title,
-    content: formData.content,
-    is_secret: formData.isSecret,
-    password: formData.isSecret ? formData.password : null,
-    attachment_url: attachmentUrl,
-    attachment_name: attachmentName
-}]);
-
-            if (error) throw error;
-
-            alert('등록되었습니다.');
-            setFormData({ title: '', content: '', isSecret: false, password: '' });
-            setView('list');
-            fetchSuggestions();
-        } catch (error) {
-            console.error("Error submitting suggestion:", error);
-            alert('오류가 발생했습니다.');
-        }
-    };
 
     // Handle Post Click
     const handlePostClick = (post) => {
@@ -120,7 +62,7 @@ if (formData.attachment) {
             setShowPasswordPrompt(true);
         } else {
             setSelectedPost(post);
-            setReplyContent(post.admin_reply || '');
+          
             setView('detail');
         }
     };
@@ -152,7 +94,7 @@ if (formData.attachment) {
         // In admin mode, both post password and admin password work.
         if (isPostPasswordMatch || (isAdmin && isAdminPasswordMatch)) {
             setSelectedPost(pendingPost);
-            setReplyContent(pendingPost.admin_reply || '');
+            
             setView('detail');
             setShowPasswordPrompt(false);
             setPendingPost(null);
@@ -161,25 +103,7 @@ if (formData.attachment) {
         }
     };
 
-    // Handle Admin Reset
-    const handleReset = async () => {
-        if (!window.confirm('정말로 모든 공사항을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
-
-        try {
-            const { error } = await supabase
-                .from('suggestions')
-                .delete()
-                .neq('id', 0); // Delete all
-
-            if (error) throw error;
-
-            alert('모든 공사항이 삭제되었습니다.');
-            fetchSuggestions();
-        } catch (error) {
-            console.error("Error resetting suggestions:", error);
-            alert('초기화 중 오류가 발생했습니다.');
-        }
-    };
+   
 
     // Handle Reply Submit
     const handleReplySubmit = async () => {
@@ -223,7 +147,27 @@ if (formData.attachment) {
             setIsSubmittingReply(false);
         }
     };
+const handleDelete = async (id) => {
+    if (!window.confirm('게시글을 삭제하시겠습니까?')) return;
 
+    try {
+        const { error } = await supabase
+            .from('suggestions')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        alert('삭제되었습니다.');
+
+        setView('list');
+        fetchSuggestions();
+
+    } catch (error) {
+        console.error(error);
+        alert('삭제 중 오류가 발생했습니다.');
+    }
+};
     const openAdminLogin = () => {
         if (isAdmin) {
             setIsAdmin(false);
