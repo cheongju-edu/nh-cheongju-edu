@@ -25,6 +25,8 @@ meal_dinner: '',
         rest_rules: '',
         smoking_rules: '',
         life_rules: '',
+        expulsion_rules: '',
+penalty_rules: '',
         checkout_banner_text: '',
         checkout_img_1: '',
         checkout_img_2: '',
@@ -529,6 +531,67 @@ async function downloadStayRequests() {
                     </div>
                 </div>
             </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+    <h2 className="text-xl font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">
+        퇴교사유 / 벌점 설정
+    </h2>
+
+    <div className="space-y-5">
+
+        {/* 퇴교사유 */}
+        <div>
+            <label className="block text-sm font-medium text-gray-700">
+                퇴교사유
+            </label>
+
+            <p className="text-xs text-gray-500 mb-2">
+                한 줄에 하나씩 입력하세요.
+            </p>
+
+            <textarea
+                rows="6"
+                className="w-full border border-gray-300 rounded-md p-3"
+                value={settings.expulsion_rules || ''}
+                onChange={(e) =>
+                    setSettings({
+                        ...settings,
+                        expulsion_rules: e.target.value
+                    })
+                }
+                placeholder={`생활성적 감점점수 10점 초과
+정당한 사유 없이 수업 거부
+고의로 교육질서를 문란케 한 자`}
+            />
+        </div>
+
+        {/* 벌점기준표 */}
+        <div>
+            <label className="block text-sm font-medium text-gray-700">
+                벌점 기준표
+            </label>
+
+            <p className="text-xs text-gray-500 mb-2">
+                형식: 내용|점수
+            </p>
+
+            <textarea
+                rows="10"
+                className="w-full border border-gray-300 rounded-md p-3"
+                value={settings.penalty_rules || ''}
+                onChange={(e) =>
+                    setSettings({
+                        ...settings,
+                        penalty_rules: e.target.value
+                    })
+                }
+                placeholder={`무단 결강자|2
+외출·외박 시 귀원 시간 미준수|2
+무단 지각자|1`}
+            />
+        </div>
+
+    </div>
+</div>
 {/* 과정 목록 관리 */}
 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
     <h2 className="text-xl font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">
