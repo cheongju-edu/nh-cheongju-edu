@@ -47,16 +47,16 @@ const Rules = () => {
                             제17조 퇴교사유
                         </h2>
 
-                        <div className="space-y-4">
-                            {[
-                               expulsionRules.map((text, idx) => (
-                            ].map((text, idx) => (
-                                <div
-                                    key={idx}
-                                    className="bg-red-50 border border-red-100 rounded-2xl px-5 py-4 text-gray-700 font-medium shadow-sm"
-                                >
-                                    {idx + 1}. {text}
-                                </div>
+                       <div className="space-y-4">
+    {expulsionRules.map((text, idx) => (
+        <div
+            key={idx}
+            className="bg-red-50 border border-red-100 rounded-2xl px-5 py-4 text-gray-700 font-medium shadow-sm"
+        >
+            {idx + 1}. {text}
+        </div>
+    ))}
+</div>
                             ))}
                         </div>
                     </div>
