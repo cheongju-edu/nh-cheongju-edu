@@ -521,7 +521,7 @@ async function downloadStayRequests() {
                 <h2 className="text-xl font-bold text-gray-800 mb-4 border-b border-gray-100 pb-2">생활수칙 설정</h2>
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">생활 수칙 (벌점 기준표 등)</label>
+                        <label className="block text-sm font-medium text-gray-700">생활 수칙 </label>
                         <textarea
                             className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                             rows="6"
