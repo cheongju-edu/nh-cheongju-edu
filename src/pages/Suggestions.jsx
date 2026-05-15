@@ -52,7 +52,82 @@ const Suggestions = () => {
     }, [fetchSuggestions]);
 
     // Handle Write Submit
+useEffect(() => {
+    fetchSuggestions();
+}, [fetchSuggestions]);
 
+// Handle Write Submit
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.title || !formData.content) {
+        alert('제목과 내용을 입력해주세요.');
+        return;
+    }
+
+    if (formData.isSecret && !formData.password) {
+        alert('비밀번호를 입력해주세요.');
+        return;
+    }
+
+    let attachmentUrl = null;
+    let attachmentName = null;
+
+    // 파일 업로드
+    if (formData.attachment) {
+        const fileName = `${Date.now()}_${formData.attachment.name}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from('notice-files')
+            .upload(fileName, formData.attachment);
+
+        if (uploadError) {
+            console.error(uploadError);
+            alert('파일 업로드 실패');
+            return;
+        }
+
+        const { data } = supabase.storage
+            .from('notice-files')
+            .getPublicUrl(fileName);
+
+        attachmentUrl = data.publicUrl;
+        attachmentName = formData.attachment.name;
+    }
+
+    // DB 저장
+    const { error } = await supabase
+        .from('suggestions')
+        .insert([
+            {
+                title: formData.title,
+                content: formData.content,
+                is_secret: formData.isSecret,
+                password: formData.isSecret ? formData.password : null,
+                attachment_url: attachmentUrl,
+                attachment_name: attachmentName
+            }
+        ]);
+
+    if (error) {
+        console.error(error);
+        alert('등록 실패');
+        return;
+    }
+
+    alert('공지사항이 등록되었습니다.');
+
+    setFormData({
+        title: '',
+        content: '',
+        isSecret: false,
+        password: '',
+        attachment: null
+    });
+
+    setView('list');
+    fetchSuggestions();
+};
 
     // Handle Post Click
     const handlePostClick = (post) => {
