@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { format } from 'date-fns';
-import { Lock, PenTool, ChevronLeft, send, Trash2 } from 'lucide-react';
+import { Lock, PenTool, ChevronLeft, Send, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../context/SettingsContext';
 
