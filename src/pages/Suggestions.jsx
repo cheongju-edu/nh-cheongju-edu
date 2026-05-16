@@ -11,6 +11,7 @@ const Suggestions = () => {
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState('list'); // 'list', 'write', 'detail'
     const [selectedPost, setSelectedPost] = useState(null);
+    const [editingPost, setEditingPost] = useState(null);
 
     // Admin State
     const [isAdmin, setIsAdmin] = useState(false);
@@ -96,7 +97,29 @@ const handleSubmit = async (e) => {
     }
 
     // DB 저장
-    const { error } = await supabase
+let error;
+
+if (editingPost) {
+
+    // 수정
+    const result = await supabase
+        .from('suggestions')
+        .update({
+            title: formData.title,
+            content: formData.content,
+            is_secret: formData.isSecret,
+            password: formData.isSecret ? formData.password : null,
+            attachment_url: attachmentUrl || editingPost.attachment_url,
+            attachment_name: attachmentName || editingPost.attachment_name
+        })
+        .eq('id', editingPost.id);
+
+    error = result.error;
+
+} else {
+
+    // 신규 등록
+    const result = await supabase
         .from('suggestions')
         .insert([
             {
@@ -109,13 +132,15 @@ const handleSubmit = async (e) => {
             }
         ]);
 
+    error = result.error;
+}
     if (error) {
         console.error(error);
         alert('등록 실패');
         return;
     }
 
-    alert('공지사항이 등록되었습니다.');
+   alert(editingPost ? '공지사항이 수정되었습니다.' : '공지사항이 등록되었습니다.');
 
     setFormData({
         title: '',
@@ -124,7 +149,7 @@ const handleSubmit = async (e) => {
         password: '',
         attachment: null
     });
-
+    setEditingPost(null);
     setView('list');
     fetchSuggestions();
 };
@@ -177,7 +202,20 @@ const handleSubmit = async (e) => {
             alert('비밀번호가 일치하지 않습니다.');
         }
     };
+const handleEdit = (post) => {
 
+    setFormData({
+        title: post.title,
+        content: post.content,
+        isSecret: post.is_secret,
+        password: post.password || '',
+        attachment: null
+    });
+
+    setEditingPost(post);
+
+    setView('write');
+};
 const handleDelete = async (id) => {
     if (!window.confirm('게시글을 삭제하시겠습니까?')) return;
 
@@ -351,7 +389,7 @@ const handleDelete = async (id) => {
                             className="w-full bg-nh-blue text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                         >
                             <Send size={18} />
-                            등록하기
+                           {editingPost ? '수정 완료' : '등록하기'}
                         </button>
                     </form>
                 </div>
@@ -387,7 +425,14 @@ const handleDelete = async (id) => {
         </div>
     )}
 </div>
-
+{isAdmin && (
+    <button
+        onClick={() => handleEdit(selectedPost)}
+        className="w-full bg-yellow-500 text-white py-2.5 rounded-lg font-bold hover:bg-yellow-600 flex items-center justify-center gap-2 mb-2"
+    >
+        ✏️ 게시글 수정
+    </button>
+)}
                     {isAdmin && (
     <button
         onClick={() => handleDelete(selectedPost.id)}
