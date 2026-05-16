@@ -9,6 +9,7 @@ const Suggestions = () => {
     const navigate = useNavigate();
     const [suggestions, setSuggestions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [submitLoading, setSubmitLoading] = useState(false);
     const [view, setView] = useState('list'); // 'list', 'write', 'detail'
     const [selectedPost, setSelectedPost] = useState(null);
     const [editingPost, setEditingPost] = useState(null);
@@ -48,9 +49,6 @@ const Suggestions = () => {
         setLoading(false);
     }, []);
 
-    useEffect(() => {
-        fetchSuggestions();
-    }, [fetchSuggestions]);
 
     // Handle Write Submit
 useEffect(() => {
@@ -60,6 +58,10 @@ useEffect(() => {
 // Handle Write Submit
 const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (submitLoading) return;
+
+    setSubmitLoading(true);
 
     if (!formData.title || !formData.content) {
         alert('제목과 내용을 입력해주세요.');
@@ -134,11 +136,14 @@ if (editingPost) {
 
     error = result.error;
 }
-    if (error) {
-        console.error(error);
-        alert('등록 실패');
-        return;
-    }
+   if (error) {
+    console.error(error);
+    alert('등록 실패');
+
+    setSubmitLoading(false);
+
+    return;
+}
 
    alert(editingPost ? '공지사항이 수정되었습니다.' : '공지사항이 등록되었습니다.');
 
@@ -150,8 +155,10 @@ if (editingPost) {
         attachment: null
     });
     setEditingPost(null);
-    setView('list');
-    fetchSuggestions();
+   setView('list');
+fetchSuggestions();
+
+setSubmitLoading(false);
 };
 
     // Handle Post Click
@@ -386,10 +393,15 @@ const handleDelete = async (id) => {
 
                         <button
                             type="submit"
+                            disabled={submitLoading}
                             className="w-full bg-nh-blue text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                         >
                             <Send size={18} />
-                           {editingPost ? '수정 완료' : '등록하기'}
+                           {submitLoading
+    ? '저장중...'
+    : editingPost
+        ? '수정 완료'
+        : '등록하기'}
                         </button>
                     </form>
                 </div>
