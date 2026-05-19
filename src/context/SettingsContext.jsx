@@ -14,7 +14,10 @@ export const SettingsProvider = ({ children }) => {
                     setLoading(false);
                     return;
                 }
-                const { data, error } = await supabase.from('site_settings').select('*').single();
+                const { data, error } = await supabase.from('site_settings').select('*')
+                 .order('id', { ascending: false })
+                .limit(1)
+                .maybeSingle();
                 if (data) setSettings(data);
                 if (error && error.code !== 'PGRST116') {
                     console.error('Error fetching settings:', error);
