@@ -32,7 +32,7 @@ const Bedding = () => {
             <div className="bg-white/80 backdrop-blur-md p-6 rounded-xl shadow-sm border border-white/20">
                 <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                     <CheckSquare className="text-nh-blue" />
-                    퇴실 시 주의사항
+                    퇴실 체크리스트
                 </h2>
                 
                 {settings?.checkout_banner_text && (
