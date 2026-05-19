@@ -54,7 +54,9 @@ penalty_rules: '',
             const { data, error } = await supabase
                 .from('site_settings')
                 .select('*')
-                .single();
+                .order('id', { ascending: false })
+                .limit(1)
+                .maybeSingle();
 
             if (data) setSettings(data);
         } catch (error) {
@@ -177,7 +179,7 @@ async function updateSettings() {
         const { error } = await supabase
             .from('site_settings')
             .update(payload)
-            .eq('id', 1);
+            .eq('id', settings.id);
 
         if (error) {
             console.error(error);
