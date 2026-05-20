@@ -283,7 +283,7 @@ const Outing = () => {
         },
 
         {
-            enableHighAccuracy: true,
+            enableHighAccuracy: false,
             timeout: 10000,
             maximumAge: 0
         }
