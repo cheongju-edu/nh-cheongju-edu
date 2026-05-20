@@ -411,16 +411,7 @@ const Outing = () => {
             {/* Admin View: Status List & Controls */}
             {isAdmin ? (
                 <div className="space-y-4">
-                    <div className="bg-red-50 border border-red-200 p-4 rounded-lg flex justify-between items-center">
-                        <span className="font-bold text-red-700">관리자 기능</span>
-                        <button
-                            onClick={handleReset}
-                            className="flex items-center gap-2 bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm"
-                        >
-                            <RefreshCw size={16} />
-                            데이터 초기화
-                        </button>
-                    </div>
+                 
 
                     <div className="space-y-3">
                         <h3 className="font-bold text-lg text-gray-800 px-1">현황 리스트</h3>
@@ -478,6 +469,16 @@ const Outing = () => {
                                 </div>
                             ))
                         )}
+                    </div>
+   <div className="bg-red-50 border border-red-200 p-4 rounded-lg flex justify-between items-center">
+                        <span className="font-bold text-red-700">관리자 기능</span>
+                        <button
+                            onClick={handleReset}
+                            className="flex items-center gap-2 bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm"
+                        >
+                            <RefreshCw size={16} />
+                            데이터 초기화
+                        </button>
                     </div>
                 </div>
             ) : (
