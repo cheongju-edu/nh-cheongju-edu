@@ -275,12 +275,12 @@ const Outing = () => {
 
         (error) => {
 
-            console.error(error);
+    console.error(error);
 
-            alert(
-                '위치 정보를 가져올 수 없습니다.\nGPS 권한을 허용해주세요.'
-            );
-        },
+    alert(
+        `위치 오류 발생\n\n코드: ${error.code}\n메시지: ${error.message}`
+    );
+},
 
         {
             enableHighAccuracy: false,
