@@ -4,6 +4,11 @@ import { format } from 'date-fns';
 import { Lock, LogOut, CheckCircle, RefreshCw } from 'lucide-react';
 import Loading from '../components/Loading';
 import { useSettings } from '../context/SettingsContext';
+import {
+    SCHOOL_LAT,
+    SCHOOL_LNG,
+    getDistance
+} from '../utils/location';
 
 const Outing = () => {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -200,30 +205,90 @@ const Outing = () => {
     };
 
     // Student Return Handler
-    const handleReturn = async () => {
-        if (!window.confirm('복귀하시겠습니까?')) return;
+   const handleReturn = async () => {
 
-        try {
-            if (!supabase) throw new Error("Supabase client not initialized");
+    if (!window.confirm('복귀하시겠습니까?')) return;
 
-            const { error } = await supabase
-                .from('stay_requests')
-                .update({
+    navigator.geolocation.getCurrentPosition(
+
+        async (position) => {
+
+            const currentLat = position.coords.latitude;
+            const currentLng = position.coords.longitude;
+
+            // 교육원과 거리 계산
+            const distance = getDistance(
+                currentLat,
+                currentLng,
+                SCHOOL_LAT,
+                SCHOOL_LNG
+            );
+
+            // 200m 밖이면 차단
+            if (distance > 200) {
+                alert(
+                    '교육원 반경 200m 이내에서만 복귀할 수 있습니다.'
+                );
+                return;
+            }
+
+            try {
+
+                if (!supabase) {
+                    throw new Error(
+                        "Supabase client not initialized"
+                    );
+                }
+
+                const { error } = await supabase
+                    .from('stay_requests')
+                    .update({
+                        status: 'returned',
+                        returned_at: new Date().toISOString(),
+                        return_lat: currentLat,
+                        return_lng: currentLng
+                    })
+                    .eq('id', currentRequestId);
+
+                if (error) throw error;
+
+                setCurrentRequestData(prev => ({
+                    ...prev,
                     status: 'returned',
                     returned_at: new Date().toISOString()
-                })
-                .eq('id', currentRequestId);
+                }));
 
-            if (error) throw error;
+                alert('복귀 처리가 완료되었습니다.');
 
-            // Update local state
-            setCurrentRequestData(prev => ({ ...prev, status: 'returned', returned_at: new Date().toISOString() }));
-            alert('복귀 처리가 완료되었습니다.');
-        } catch (error) {
-            console.error("Error updating document: ", error);
-            alert(`오류가 발생했습니다: ${error.message}`);
+            } catch (error) {
+
+                console.error(
+                    "Error updating document: ",
+                    error
+                );
+
+                alert(
+                    `오류가 발생했습니다: ${error.message}`
+                );
+            }
+        },
+
+        (error) => {
+
+            console.error(error);
+
+            alert(
+                '위치 정보를 가져올 수 없습니다.\nGPS 권한을 허용해주세요.'
+            );
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
         }
-    };
+    );
+};
 
     // Admin Return Handler
     const handleAdminReturn = async (id) => {
