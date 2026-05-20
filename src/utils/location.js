@@ -1,5 +1,5 @@
-export const SCHOOL_LAT = 36.6067;
-export const SCHOOL_LNG = 127.5437;
+export const SCHOOL_LAT = 36.5768138;
+export const SCHOOL_LNG = 127.5700568;
 
 export function getDistance(lat1, lon1, lat2, lon2) {
   const R = 6371e3;
