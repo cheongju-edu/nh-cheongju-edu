@@ -646,7 +646,11 @@ async function downloadStayRequests() {
                                 <div key={idx} className="p-3 border border-gray-200 rounded-lg bg-gray-50">
                                     <span className="text-xs font-bold text-gray-600 block mb-2">사진 {idx + 1}</span>
                                     {settings[`checkout_img_${idx+1}`] && (
-                                        <img src={settings[`checkout_img_${idx+1}`]} alt={`미리보기 ${idx+1}`} className="w-full h-24 object-cover rounded mb-2" />
+                                        <img
+  src={settings[`checkout_img_${idx+1}`]}
+  alt={`미리보기 ${idx+1}`}
+  className="w-full h-auto rounded mb-2 border"
+/>
                                     )}
                                     <input
                                         type="file"
