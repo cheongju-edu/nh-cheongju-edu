@@ -223,26 +223,26 @@ async function downloadStayRequests() {
     }
 
     // CSV 헤더
-   const headers = [
-    '신청일시',
+ const headers = [
+    '출발시간',
     '과정명',
     '이름',
     '교번',
     '구분',
     '목적지',
-    '복귀시간',
+    '실제복귀시간',
     '상태'
 ];
 
     // CSV 내용 생성
    const rows = data.map(item => [
     item.created_at || '',
-    item.course || '',
+    item.course_name || '',
     item.name || '',
     item.student_id || '',
     item.type || '',
     item.destination || '',
-    item.return_time || item.end_date || '',
+    item.returned_time || '',
     item.status || ''
 ]);
 
