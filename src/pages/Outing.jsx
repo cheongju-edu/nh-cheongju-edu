@@ -225,9 +225,9 @@ const Outing = () => {
             );
 
             // 200m 밖이면 차단
-            if (distance > 300) {
+            if (distance > 200) {
                 alert(
-                    '교육원 반경 300m 이내에서만 복귀할 수 있습니다.'
+                    '교육원 반경 200m 이내에서만 복귀할 수 있습니다.'
                 );
                 return;
             }
@@ -273,12 +273,12 @@ const Outing = () => {
             }
         },
 
-        (error) => {
+       (error) => {
 
     console.error(error);
 
     alert(
-        `위치 오류 발생\n\n코드: ${error.code}\n메시지: ${error.message}`
+        '위치 정보를 가져올 수 없습니다.\nGPS 권한을 허용해주세요.'
     );
 },
 
@@ -570,7 +570,7 @@ const Outing = () => {
                                 </div>
 <div>
     <label className="block text-xs text-gray-500 mb-1">
-        복귀시간
+        복귀예정시간
     </label>
 
     <input
