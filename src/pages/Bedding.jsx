@@ -40,15 +40,14 @@ const Bedding = () => {
                 )}
 
                 {images.length > 0 && (
-                    <div className="grid grid-cols-2 gap-3 mb-6">
-                        {images.map((imgUrl, idx) => (
-                            <div key={idx} className="rounded-lg overflow-hidden border border-gray-200/50 shadow-sm aspect-video bg-gray-50">
-                                <img src={imgUrl} alt={`퇴실 안내 사진 ${idx + 1}`} className="w-full h-full object-cover" />
-                            </div>
-                        ))}
-                    </div>
-                )}
-
+    <div className="grid grid-cols-2 gap-3 mb-6">
+        {images.map((imgUrl, idx) => (
+            <div key={idx} className="rounded-lg overflow-hidden border border-gray-200/50 shadow-sm aspect-[3/4] bg-gray-50">
+                <img src={imgUrl} alt={`퇴실 안내 사진 ${idx + 1}`} className="w-full h-full object-cover" />
+            </div>
+        ))}
+    </div>
+)}
                 {checklistItems.length > 0 && (
                     <div className="space-y-3">
                         {checklistItems.map((text, idx) => (
