@@ -43,7 +43,7 @@ const Bedding = () => {
                     <div className="grid grid-cols-2 gap-3 mb-6">
                         {images.map((imgUrl, idx) => (
                             <div key={idx} className="rounded-lg overflow-hidden border border-gray-200/50 shadow-sm aspect-video bg-gray-50">
-                                <img src={imgUrl} alt={`퇴실 안내 사진 ${idx + 1}`} className="w-full h-full object-contain" />
+                                <img src={imgUrl} alt={`퇴실 안내 사진 ${idx + 1}`} className="w-full h-full object-cover" />
                             </div>
                         ))}
                     </div>
