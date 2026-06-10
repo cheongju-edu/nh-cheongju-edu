@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { CheckSquare, Square } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import Loading from '../components/Loading';
-
 import { useSettings } from '../context/SettingsContext';
 
 const Bedding = () => {
@@ -15,7 +14,6 @@ const Bedding = () => {
         setChecked(prev => ({ ...prev, [idx]: !prev[idx] }));
     };
 
-    // Calculate dynamic checklist items (split by line)
     const checklistItems = settings?.checkout_checklist 
         ? settings.checkout_checklist.split('\n').filter(item => item.trim() !== '')
         : [];
@@ -25,7 +23,7 @@ const Bedding = () => {
         settings?.checkout_img_2,
         settings?.checkout_img_3,
         settings?.checkout_img_4,
-    ].filter(Boolean); // Only truthy URLs
+    ].filter(Boolean);
 
     return (
         <div className="space-y-6">
@@ -44,8 +42,8 @@ const Bedding = () => {
                 {images.length > 0 && (
                     <div className="grid grid-cols-2 gap-3 mb-6">
                         {images.map((imgUrl, idx) => (
-                            <div key={idx} className="rounded-lg overflow-hidden border border-gray-200/50 shadow-sm aspect-square bg-gray-50 flex items-center justify-center">
-                                <img src={imgUrl} alt={`퇴실 안내 사진 ${idx + 1}`} className="w-full h-full object-cover" />
+                            <div key={idx} className="rounded-lg overflow-hidden border border-gray-200/50 shadow-sm aspect-video bg-gray-50">
+                                <img src={imgUrl} alt={`퇴실 안내 사진 ${idx + 1}`} className="w-full h-full object-contain" />
                             </div>
                         ))}
                     </div>
@@ -70,7 +68,6 @@ const Bedding = () => {
                     </div>
                 )}
             </div>
-
             <div className="text-center text-xs text-white/80 drop-shadow-md pb-4">
                 모든 항목을 확인 후 퇴실해주세요.
             </div>
