@@ -113,7 +113,7 @@ const Vehicle = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs text-gray-500 mb-1">방문시작일</label>
+                                <label className="block text-xs text-gray-500 mb-1">교육시작일</label>
                                 <input
                                     type="date"
                                     value={formData.visit_start_date}
@@ -122,7 +122,7 @@ const Vehicle = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs text-gray-500 mb-1">방문종료일</label>
+                                <label className="block text-xs text-gray-500 mb-1">교육종료일</label>
                                 <input
                                     type="date"
                                     value={formData.visit_end_date}
