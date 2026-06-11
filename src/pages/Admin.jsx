@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import ExcelJS from 'exceljs';
+import { format } from 'date-fns';
 
 const Admin = () => {
     const [settings, setSettings] = useState({
@@ -205,7 +207,6 @@ async function updateSettings() {
     }
 }
 async function downloadStayRequests() {
- 
     const { data, error } = await supabase
         .from('stay_requests')
         .select('*')
@@ -222,52 +223,83 @@ async function downloadStayRequests() {
         return;
     }
 
-    // CSV 헤더
- const headers = [
-    '출발시간',
-    '과정명',
-    '이름',
-    '교번',
-    '구분',
-    '목적지',
-    '실제복귀시간',
-    '상태'
-];
+    const formatDate = (value) => {
+        if (!value) return '';
+        try {
+            return format(new Date(value), 'yyyy-MM-dd HH:mm');
+        } catch {
+            return '';
+        }
+    };
 
-    // CSV 내용 생성
-   const rows = data.map(item => [
-    item.created_at || '',
-    item.course_name || '',
-    item.name || '',
-    item.student_id || '',
-    item.type || '',
-    item.destination || '',
-    item.returned_time || '',
-    item.status || ''
-]);
+    const workbook = new ExcelJS.Workbook();
+    const today = new Date().toISOString().slice(0, 10);
+    const worksheet = workbook.addWorksheet(`외출외박신청_${today}`);
 
-    const csvContent = [
-        headers.join(','),
-        ...rows.map(row =>
-            row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
-        )
-    ].join('\n');
+    // 열 너비 설정
+    worksheet.columns = [
+        { width: 32 },  // 출발시간
+        { width: 24 },  // 과정명
+        { width: 8 },   // 교번
+        { width: 7 },   // 이름
+        { width: 5 },   // 구분
+        { width: 15 },  // 목적지
+        { width: 12 },  // 실제복귀시간
+        { width: 8 },   // 상태
+    ];
 
-    // 다운로드 생성
-    const blob = new Blob(
-        ['\uFEFF' + csvContent],
-        { type: 'text/csv;charset=utf-8;' }
-    );
+    // 1행: 제목
+    worksheet.mergeCells('A1:H1');
+    const titleCell = worksheet.getCell('A1');
+    titleCell.value = '외출관리대장';
+    titleCell.font = { name: '맑은 고딕', size: 20, bold: true, underline: 'double' };
+    titleCell.alignment = { horizontal: 'center', vertical: 'center' };
+    worksheet.getRow(1).height = 29;
 
+    // 2행: 헤더
+    const headerRow = worksheet.addRow([
+        '출발시간', '과정명', '교번', '이름', '구분', '목적지', '실제복귀시간', '상태'
+    ]);
+    headerRow.eachCell((cell) => {
+        cell.font = { name: '맑은 고딕', bold: true };
+        cell.alignment = { horizontal: 'center', vertical: 'center' };
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFDCE6F1' }
+        };
+    });
+    headerRow.height = 18.45;
+
+    // 데이터 행 (컬럼 순서: 교번 → 이름)
+    data.forEach(item => {
+        worksheet.addRow([
+            formatDate(item.created_at),
+            item.course_name || '',
+            item.student_id || '',
+            item.name || '',
+            item.type || '',
+            item.destination || '',
+            formatDate(item.returned_at),
+            item.status || ''
+        ]);
+    });
+
+    // 다운로드
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement('a');
     link.href = url;
-    link.download = `외출외박신청_${new Date().toISOString().slice(0,10)}.csv`;
+    link.download = `외출외박신청_${today}.xlsx`;
 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }
 
 //  if (loading) return <div className="p-8 font-medium text-gray-600">데이터를 불러오는 중...</div>;
