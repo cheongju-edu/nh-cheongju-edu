@@ -10,8 +10,7 @@ const Admin = () => {
         main_description: '',
         bg_image_url: '',
         operation_password: '', // 추가된 필드
-        course_start_date: '',
-       course_end_date: '',
+       
         facility_map_url: '',
         facility_info_1: '',
         facility_info_2: '',
@@ -320,9 +319,6 @@ async function downloadStayRequests() {
         return;
     }
 
-    const startDate = settings.course_start_date || '';
-    const endDate = settings.course_end_date || '';
-
     const workbook = new ExcelJS.Workbook();
     const today = new Date().toISOString().slice(0, 10);
     const worksheet = workbook.addWorksheet(`차량등록_${today}`);
@@ -355,9 +351,9 @@ async function downloadStayRequests() {
         worksheet.addRow([
             item.car_number || '',
             item.user_name || '',
-            startDate,
+            item.visit_start_date || '',
             '00:00',
-            endDate,
+            item.visit_end_date || '',
             '00:00',
             '',
             ''
@@ -484,26 +480,7 @@ async function downloadStayRequests() {
                             />
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-    <div>
-        <label className="block text-sm font-medium text-gray-700">교육 시작일</label>
-        <input
-            type="date"
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-            value={settings.course_start_date || ''}
-            onChange={(e) => setSettings({ ...settings, course_start_date: e.target.value })}
-        />
-    </div>
-    <div>
-        <label className="block text-sm font-medium text-gray-700">교육 종료일</label>
-        <input
-            type="date"
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-            value={settings.course_end_date || ''}
-            onChange={(e) => setSettings({ ...settings, course_end_date: e.target.value })}
-        />
-    </div>
-</div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700">관리자 운영 비밀번호 (외출/건의사항 등)</label>
                         <input
