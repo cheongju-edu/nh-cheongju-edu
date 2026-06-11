@@ -5,10 +5,12 @@ import { useSettings } from '../context/SettingsContext';
 import Loading from '../components/Loading';
 
 const Vehicle = () => {
-    const { settings, loading } = useSettings();
+    const { loading } = useSettings();
     const [formData, setFormData] = useState({
         car_number: '',
-        user_name: ''
+        user_name: '',
+        visit_start_date: '',
+        visit_end_date: ''
     });
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -26,13 +28,18 @@ const Vehicle = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.car_number || !formData.user_name) {
-            alert('차량번호와 성명을 모두 입력해주세요.');
+        if (!formData.car_number || !formData.user_name || !formData.visit_start_date || !formData.visit_end_date) {
+            alert('모든 항목을 입력해주세요.');
             return;
         }
 
         if (/\s/.test(formData.car_number)) {
             alert('차량번호에는 공백을 입력할 수 없습니다.');
+            return;
+        }
+
+        if (formData.visit_start_date > formData.visit_end_date) {
+            alert('방문종료일은 방문시작일보다 빠를 수 없습니다.');
             return;
         }
 
@@ -44,13 +51,15 @@ const Vehicle = () => {
                 .from('vehicle_registrations')
                 .insert([{
                     car_number: formData.car_number,
-                    user_name: formData.user_name
+                    user_name: formData.user_name,
+                    visit_start_date: formData.visit_start_date,
+                    visit_end_date: formData.visit_end_date
                 }]);
 
             if (error) throw error;
 
             setSubmitted(true);
-            setFormData({ car_number: '', user_name: '' });
+            setFormData({ car_number: '', user_name: '', visit_start_date: '', visit_end_date: '' });
         } catch (error) {
             console.error('Error registering vehicle:', error);
             alert(`오류가 발생했습니다: ${error.message || '알 수 없는 오류'}`);
@@ -59,10 +68,6 @@ const Vehicle = () => {
         }
     };
 
-    const visitPeriod = settings?.course_start_date && settings?.course_end_date
-        ? `${settings.course_start_date} ~ ${settings.course_end_date}`
-        : null;
-
     return (
         <div className="space-y-6">
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
@@ -70,12 +75,6 @@ const Vehicle = () => {
                     <Car size={20} className="text-amber-500" />
                     차량등록
                 </h3>
-
-                {visitPeriod && (
-                    <div className="mb-4 text-sm text-gray-600 bg-amber-50 border border-amber-200 rounded-lg p-3">
-                        등록 기간: <span className="font-bold">{visitPeriod}</span>
-                    </div>
-                )}
 
                 {submitted ? (
                     <div className="text-center py-8 space-y-3">
@@ -111,6 +110,26 @@ const Vehicle = () => {
                                 className="w-full p-2 border border-gray-200 rounded focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none transition-colors"
                                 placeholder="홍길동"
                             />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">방문시작일</label>
+                                <input
+                                    type="date"
+                                    value={formData.visit_start_date}
+                                    onChange={(e) => setFormData({ ...formData, visit_start_date: e.target.value })}
+                                    className="w-full p-2 border border-gray-200 rounded focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">방문종료일</label>
+                                <input
+                                    type="date"
+                                    value={formData.visit_end_date}
+                                    onChange={(e) => setFormData({ ...formData, visit_end_date: e.target.value })}
+                                    className="w-full p-2 border border-gray-200 rounded focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none transition-colors"
+                                />
+                            </div>
                         </div>
 
                         <button
