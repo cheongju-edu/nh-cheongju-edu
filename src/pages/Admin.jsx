@@ -10,6 +10,8 @@ const Admin = () => {
         main_description: '',
         bg_image_url: '',
         operation_password: '', // 추가된 필드
+        course_start_date: '',
+       course_end_date: '',
         facility_map_url: '',
         facility_info_1: '',
         facility_info_2: '',
@@ -301,7 +303,82 @@ async function downloadStayRequests() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
+  async function downloadVehicleRegistrations() {
+    const { data, error } = await supabase
+        .from('vehicle_registrations')
+        .select('*')
+        .order('created_at', { ascending: false });
 
+    if (error) {
+        alert('데이터 다운로드 실패');
+        console.error(error);
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        alert('등록된 차량이 없습니다.');
+        return;
+    }
+
+    const startDate = settings.course_start_date || '';
+    const endDate = settings.course_end_date || '';
+
+    const workbook = new ExcelJS.Workbook();
+    const today = new Date().toISOString().slice(0, 10);
+    const worksheet = workbook.addWorksheet(`차량등록_${today}`);
+
+    worksheet.columns = [
+        { width: 14 }, // 차량번호
+        { width: 12 }, // 사용자명
+        { width: 14 }, // 방문시작일
+        { width: 12 }, // 방문시작시간
+        { width: 14 }, // 방문종료일
+        { width: 12 }, // 방문종료시간
+        { width: 14 }, // 연락처
+        { width: 14 }, // 메모
+    ];
+
+    const headerRow = worksheet.addRow([
+        '차량번호', '사용자명', '방문시작일', '방문시작시간', '방문종료일', '방문종료시간', '연락처', '메모'
+    ]);
+    headerRow.eachCell((cell) => {
+        cell.font = { name: '맑은 고딕', bold: true };
+        cell.alignment = { horizontal: 'center', vertical: 'center' };
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFDCE6F1' }
+        };
+    });
+
+    data.forEach(item => {
+        worksheet.addRow([
+            item.car_number || '',
+            item.user_name || '',
+            startDate,
+            '00:00',
+            endDate,
+            '00:00',
+            '',
+            ''
+        ]);
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `차량등록_${today}.xlsx`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
 //  if (loading) return <div className="p-8 font-medium text-gray-600">데이터를 불러오는 중...</div>;
 
     const handleLogin = (e) => {
@@ -407,7 +484,26 @@ async function downloadStayRequests() {
                             />
                         </div>
                     </div>
-
+                    <div className="grid grid-cols-2 gap-4">
+    <div>
+        <label className="block text-sm font-medium text-gray-700">교육 시작일</label>
+        <input
+            type="date"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            value={settings.course_start_date || ''}
+            onChange={(e) => setSettings({ ...settings, course_start_date: e.target.value })}
+        />
+    </div>
+    <div>
+        <label className="block text-sm font-medium text-gray-700">교육 종료일</label>
+        <input
+            type="date"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            value={settings.course_end_date || ''}
+            onChange={(e) => setSettings({ ...settings, course_end_date: e.target.value })}
+        />
+    </div>
+</div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">관리자 운영 비밀번호 (외출/건의사항 등)</label>
                         <input
@@ -720,7 +816,12 @@ async function downloadStayRequests() {
     >
         📥 외출/외박 신청자 엑셀 다운로드
     </button>
-
+<button
+    onClick={downloadVehicleRegistrations}
+    className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-md transition shadow-md"
+>
+    🚗 차량등록 엑셀 다운로드
+</button>
     <button
         onClick={updateSettings}
         disabled={isSaving}
