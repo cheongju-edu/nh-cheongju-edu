@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Map, BookOpen, AlertCircle, CheckSquare, Coffee, car } from 'lucide-react';
+import { LogOut, Map, BookOpen, AlertCircle, CheckSquare, Coffee, Car } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import Loading from '../components/Loading';
 
