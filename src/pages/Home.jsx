@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Map, BookOpen, AlertCircle, CheckSquare, Coffee } from 'lucide-react';
+import { LogOut, Map, BookOpen, AlertCircle, CheckSquare, Coffee, car } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import Loading from '../components/Loading';
 
@@ -47,44 +47,50 @@ const Home = () => {
             <div className="space-y-4">
 
                 {/* Grid Menu */}
-                <div className="grid grid-cols-2 gap-4">
-                    <MenuItem
-                        icon={LogOut}
-                        label="외출/외박 신청"
-                        to="/outing"
-                        color="bg-nh-blue"
-                    />
-                    <MenuItem
-                        icon={Map}
-                        label="시설 안내"
-                        to="/facility"
-                        color="bg-nh-green"
-                    />
-                    <MenuItem
-                        icon={Coffee}
-                        label="생활 안내"
-                        to="/life"
-                        color="bg-orange-400"
-                    />
-                    <MenuItem
-                        icon={BookOpen}
-                        label="생활 수칙"
-                        to="/rules"
-                        color="bg-red-500"
-                    />
-                    <MenuItem
-                        icon={CheckSquare}
-                        label="퇴실시 주의사항"
-                        to="/bedding"
-                        color="bg-indigo-500"
-                    />
-                   <MenuItem
-                        icon={AlertCircle}
-                        label="공지사항"
-                        to="/suggestions"
-                        color="bg-pink-500"
-                    />
-                </div>
+<div className="grid grid-cols-2 gap-4">
+    <MenuItem
+        icon={LogOut}
+        label="외출/외박 신청"
+        to="/outing"
+        color="bg-nh-blue"
+    />
+    <MenuItem
+        icon={Car}
+        label="차량등록"
+        to="/vehicle"
+        color="bg-amber-500"
+    />
+    <MenuItem
+        icon={Map}
+        label="시설 안내"
+        to="/facility"
+        color="bg-nh-green"
+    />
+    <MenuItem
+        icon={Coffee}
+        label="생활 안내"
+        to="/life"
+        color="bg-orange-400"
+    />
+    <MenuItem
+        icon={BookOpen}
+        label="생활 수칙"
+        to="/rules"
+        color="bg-red-500"
+    />
+    <MenuItem
+        icon={CheckSquare}
+        label="퇴실시 주의사항"
+        to="/bedding"
+        color="bg-indigo-500"
+    />
+   <MenuItem
+        icon={AlertCircle}
+        label="공지사항"
+        to="/suggestions"
+        color="bg-pink-500"
+    />
+</div>
             </div>
         </div>
     );
