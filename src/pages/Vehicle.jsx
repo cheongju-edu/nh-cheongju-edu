@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Car, CheckCircle } from 'lucide-react';
+import { Car, CheckCircle, Lock, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useSettings } from '../context/SettingsContext';
 import Loading from '../components/Loading';
