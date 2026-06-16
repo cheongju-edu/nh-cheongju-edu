@@ -302,7 +302,7 @@ async function downloadStayRequests() {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
-  async function downloadVehicleRegistrations() {
+async function downloadVehicleRegistrations() {
     const { data, error } = await supabase
         .from('vehicle_registrations')
         .select('*')
@@ -319,23 +319,42 @@ async function downloadStayRequests() {
         return;
     }
 
+    const formatDate = (value) => {
+        if (!value) return '';
+        try {
+            return format(new Date(value), 'yyyy-MM-dd HH:mm');
+        } catch {
+            return '';
+        }
+    };
+
+    const formatDateOnly = (value) => {
+        if (!value) return '';
+        try {
+            return format(new Date(value), 'yyyy-MM-dd');
+        } catch {
+            return '';
+        }
+    };
+
     const workbook = new ExcelJS.Workbook();
     const today = new Date().toISOString().slice(0, 10);
     const worksheet = workbook.addWorksheet(`차량등록_${today}`);
 
     worksheet.columns = [
+        { width: 18 }, // 신청일시
         { width: 14 }, // 차량번호
-        { width: 12 }, // 사용자명
+        { width: 10 }, // 사용자명
         { width: 14 }, // 방문시작일
         { width: 12 }, // 방문시작시간
         { width: 14 }, // 방문종료일
         { width: 12 }, // 방문종료시간
-        { width: 14 }, // 연락처
+        { width: 12 }, // 연락처
         { width: 14 }, // 메모
     ];
 
     const headerRow = worksheet.addRow([
-        '차량번호', '사용자명', '방문시작일', '방문시작시간', '방문종료일', '방문종료시간', '연락처', '메모'
+        '신청일시', '차량번호', '사용자명', '방문시작일', '방문시작시간', '방문종료일', '방문종료시간', '연락처', '메모'
     ]);
     headerRow.eachCell((cell) => {
         cell.font = { name: '맑은 고딕', bold: true };
@@ -349,11 +368,12 @@ async function downloadStayRequests() {
 
     data.forEach(item => {
         worksheet.addRow([
+            formatDate(item.created_at),
             item.car_number || '',
             item.user_name || '',
-            item.visit_start_date || '',
+            formatDateOnly(item.visit_start_date),
             '00:00',
-            item.visit_end_date || '',
+            formatDateOnly(item.visit_end_date),
             '00:00',
             '',
             ''
