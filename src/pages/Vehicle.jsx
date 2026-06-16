@@ -5,7 +5,7 @@ import { useSettings } from '../context/SettingsContext';
 import Loading from '../components/Loading';
 
 const Vehicle = () => {
-    const { settings, loading } = useSettings();   // ← settings 추가
+    const { settings, loading } = useSettings();
     const [formData, setFormData] = useState({
         car_number: '',
         user_name: '',
@@ -14,9 +14,9 @@ const Vehicle = () => {
     });
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-    const [isAdmin, setIsAdmin] = useState(false);         
-    const [showAdminLogin, setShowAdminLogin] = useState(false); 
-    const [password, setPassword] = useState('');       
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [showAdminLogin, setShowAdminLogin] = useState(false);
+    const [password, setPassword] = useState('');
 
     if (loading) return <Loading />;
 
@@ -42,7 +42,7 @@ const Vehicle = () => {
         }
 
         if (formData.visit_start_date > formData.visit_end_date) {
-            alert('방문종료일은 방문시작일보다 빠를 수 없습니다.');
+            alert('교육종료일은 교육시작일보다 빠를 수 없습니다.');
             return;
         }
 
@@ -97,9 +97,9 @@ const Vehicle = () => {
         }
     };
 
-    if (loading) return <Loading />;  // ← 기존 코드
     return (
         <div className="space-y-6">
+
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-gray-800">차량등록</h2>
                 <button
@@ -140,18 +140,12 @@ const Vehicle = () => {
                     </button>
                 </div>
             )}
-            {/* ↑ 여기까지 추가 */}
 
-            {/* 기존 코드 그대로 유지 */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                     <Car size={20} className="text-amber-500" />
                     차량등록
                 </h3>
-                {/* ... 기존 submitted/form 코드 ... */}
-            </div>
-        </div>
-    );
 
                 {submitted ? (
                     <div className="text-center py-8 space-y-3">
