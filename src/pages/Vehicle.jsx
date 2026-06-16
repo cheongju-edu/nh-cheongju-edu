@@ -5,7 +5,7 @@ import { useSettings } from '../context/SettingsContext';
 import Loading from '../components/Loading';
 
 const Vehicle = () => {
-    const { loading } = useSettings();
+    const { settings, loading } = useSettings();   // ← settings 추가
     const [formData, setFormData] = useState({
         car_number: '',
         user_name: '',
@@ -14,6 +14,9 @@ const Vehicle = () => {
     });
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);         
+    const [showAdminLogin, setShowAdminLogin] = useState(false); 
+    const [password, setPassword] = useState('');       
 
     if (loading) return <Loading />;
 
