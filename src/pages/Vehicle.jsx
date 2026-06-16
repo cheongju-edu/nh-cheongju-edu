@@ -71,13 +71,87 @@ const Vehicle = () => {
         }
     };
 
+    const handleAdminLogin = () => {
+        const opPassword = settings?.operation_password || '1234';
+        if (password === opPassword) {
+            setIsAdmin(true);
+            setShowAdminLogin(false);
+            setPassword('');
+        } else {
+            alert('비밀번호가 틀렸습니다.');
+        }
+    };
+
+    const handleReset = async () => {
+        if (!window.confirm('정말로 모든 차량등록 데이터를 초기화하시겠습니까?')) return;
+        try {
+            const { error } = await supabase
+                .from('vehicle_registrations')
+                .delete()
+                .neq('id', 0);
+            if (error) throw error;
+            alert('초기화되었습니다.');
+        } catch (error) {
+            console.error('Error resetting data:', error);
+            alert(`초기화 중 오류가 발생했습니다: ${error.message}`);
+        }
+    };
+
+    if (loading) return <Loading />;  // ← 기존 코드
     return (
         <div className="space-y-6">
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold text-gray-800">차량등록</h2>
+                <button
+                    onClick={() => isAdmin ? setIsAdmin(false) : setShowAdminLogin(!showAdminLogin)}
+                    className={`p-2 rounded-full ${isAdmin ? 'bg-nh-blue text-white' : 'text-gray-400 hover:bg-gray-100'}`}
+                >
+                    <Lock size={20} />
+                </button>
+            </div>
+
+            {showAdminLogin && !isAdmin && (
+                <div className="bg-gray-100 p-4 rounded-lg flex gap-2">
+                    <input
+                        type="password"
+                        placeholder="관리자 비밀번호"
+                        className="flex-1 p-2 border rounded"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button
+                        onClick={handleAdminLogin}
+                        className="bg-nh-blue text-white px-4 py-2 rounded font-bold"
+                    >
+                        확인
+                    </button>
+                </div>
+            )}
+
+            {isAdmin && (
+                <div className="bg-red-50 border border-red-200 p-4 rounded-lg flex justify-between items-center">
+                    <span className="font-bold text-red-700">관리자 기능</span>
+                    <button
+                        onClick={handleReset}
+                        className="flex items-center gap-2 bg-red-600 text-white px-3 py-1.5 rounded hover:bg-red-700 text-sm"
+                    >
+                        <RefreshCw size={16} />
+                        데이터 초기화
+                    </button>
+                </div>
+            )}
+            {/* ↑ 여기까지 추가 */}
+
+            {/* 기존 코드 그대로 유지 */}
             <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                 <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
                     <Car size={20} className="text-amber-500" />
                     차량등록
                 </h3>
+                {/* ... 기존 submitted/form 코드 ... */}
+            </div>
+        </div>
+    );
 
                 {submitted ? (
                     <div className="text-center py-8 space-y-3">
