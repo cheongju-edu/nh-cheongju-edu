@@ -374,7 +374,7 @@ async function downloadVehicleRegistrations() {
             formatDateOnly(item.visit_start_date),
             '00:00',
             formatDateOnly(item.visit_end_date),
-            '00:00',
+            '18:59',
             '',
             ''
         ]);
