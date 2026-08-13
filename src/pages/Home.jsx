@@ -50,7 +50,7 @@ const Home = () => {
 <div className="grid grid-cols-2 gap-4">
     <MenuItem
         icon={LogOut}
-        label="외출/외박 신청"
+        label="외출 신청"
         to="/outing"
         color="bg-nh-blue"
     />
