@@ -20,21 +20,19 @@ const Outing = () => {
         return localStorage.getItem('current_request_id');
     });
     const [currentRequestData, setCurrentRequestData] = useState(null);
+    const [checkingRequest, setCheckingRequest] = useState(!!localStorage.getItem('current_request_id'));
 
     // Form State
- const [formData, setFormData] = useState({
-    course_name: '',
-
-    studentId: '',
-    name: '',
-    type: '외출',
-    destination: '',
-    return_time: ''
-});
+    const [formData, setFormData] = useState({
+        course_name: '',
+        studentId: '',
+        name: '',
+        destination: '',
+        returnTime: ''
+    });
 
     const [outings, setOutings] = useState([]);
     const [loading, setLoading] = useState(true);
-
     const { settings } = useSettings();
 
     // Time Restriction Check
@@ -67,14 +65,20 @@ const Outing = () => {
         };
     };
 
+    const timeStatus = isTimeAllowed();
+
     // Fetch current request status if ID exists
     useEffect(() => {
         if (!supabase) {
             console.error("Supabase client not initialized");
             return;
         }
+
         const fetchCurrentRequest = async () => {
-            if (!currentRequestId) return;
+            if (!currentRequestId) {
+                setCheckingRequest(false);
+                return;
+            }
 
             const { data, error } = await supabase
                 .from('stay_requests')
@@ -85,16 +89,14 @@ const Outing = () => {
             if (error) {
                 console.error("Error fetching current request:", error);
                 // If error (e.g., deleted), clear local storage
-                if (error.code === 'PGRST116') { // JSON object requested, multiple (or no) rows returned
+                if (error.code === 'PGRST116') {
                     localStorage.removeItem('current_request_id');
                     setCurrentRequestId(null);
                 }
             } else {
                 setCurrentRequestData(data);
-                // If returned, clear local storage (optional, but per requirement we show form if returned)
-                // However, requirement says: "If status is 'returned' or ID is missing, show form".
-                // So we just keep the data to show history or status, but UI will decide what to show.
             }
+            setCheckingRequest(false);
         };
 
         fetchCurrentRequest();
@@ -102,6 +104,7 @@ const Outing = () => {
 
     const fetchStayRequests = useCallback(async () => {
         if (!isAdmin || !supabase) return;
+
         setLoading(true);
         try {
             const { data, error } = await supabase
@@ -130,6 +133,7 @@ const Outing = () => {
 
         // Real-time subscription for Admin
         if (!supabase) return;
+
         const subscription = supabase
             .channel('stay_requests_channel')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'stay_requests' }, () => {
@@ -142,7 +146,6 @@ const Outing = () => {
         };
     }, [isAdmin, fetchStayRequests]);
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -152,12 +155,13 @@ const Outing = () => {
             return;
         }
 
- if (
-    !formData.course_name ||
-    !formData.studentId ||
-    !formData.name ||
-    !formData.destination
-) {
+        if (
+            !formData.course_name ||
+            !formData.studentId ||
+            !formData.name ||
+            !formData.destination ||
+            !formData.returnTime
+        ) {
             alert('모든 항목을 입력해주세요.');
             return;
         }
@@ -167,18 +171,17 @@ const Outing = () => {
 
             const { data, error } = await supabase
                 .from('stay_requests')
-               .insert([
-{
-    course_name: formData.course_name,
-
-    student_id: formData.studentId,
-    name: formData.name,
-    type: formData.type,
-    destination: formData.destination,
-    return_time: formData.returnTime,
-    status: 'active'
-}
-])
+                .insert([
+                    {
+                        course_name: formData.course_name,
+                        student_id: formData.studentId,
+                        name: formData.name,
+                        type: '외출',
+                        destination: formData.destination,
+                        return_time: formData.returnTime || null,
+                        status: 'active'
+                    }
+                ])
                 .select()
                 .single();
 
@@ -189,14 +192,14 @@ const Outing = () => {
             setCurrentRequestId(data.id);
             setCurrentRequestData(data);
 
-      setFormData({
-    course_name: '',
-    studentId: '',
-    name: '',
-    type: '외출',
-    destination: '',
-    returnTime: ''
-});
+            setFormData({
+                course_name: '',
+                studentId: '',
+                name: '',
+                destination: '',
+                returnTime: ''
+            });
+
             alert('신청이 완료되었습니다.');
         } catch (error) {
             console.error("Error adding document: ", error);
@@ -205,90 +208,70 @@ const Outing = () => {
     };
 
     // Student Return Handler
-   const handleReturn = async () => {
+    const handleReturn = async () => {
+        if (!window.confirm('복귀하시겠습니까?')) return;
 
-    if (!window.confirm('복귀하시겠습니까?')) return;
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const currentLat = position.coords.latitude;
+                const currentLng = position.coords.longitude;
 
-    navigator.geolocation.getCurrentPosition(
-
-        async (position) => {
-
-            const currentLat = position.coords.latitude;
-            const currentLng = position.coords.longitude;
-
-            // 교육원과 거리 계산
-            const distance = getDistance(
-                currentLat,
-                currentLng,
-                SCHOOL_LAT,
-                SCHOOL_LNG
-            );
-
-            // 200m 밖이면 차단
-            if (distance > 200) {
-                alert(
-                    '교육원 반경 200m 이내에서만 복귀할 수 있습니다.'
+                // 교육원과 거리 계산
+                const distance = getDistance(
+                    currentLat,
+                    currentLng,
+                    SCHOOL_LAT,
+                    SCHOOL_LNG
                 );
-                return;
-            }
 
-            try {
-
-                if (!supabase) {
-                    throw new Error(
-                        "Supabase client not initialized"
-                    );
+                // 200m 밖이면 차단
+                if (distance > 200) {
+                    alert('교육원 반경 200m 이내에서만 복귀할 수 있습니다.');
+                    return;
                 }
 
-                const { error } = await supabase
-                    .from('stay_requests')
-                    .update({
+                try {
+                    if (!supabase) {
+                        throw new Error("Supabase client not initialized");
+                    }
+
+                    const { error } = await supabase
+                        .from('stay_requests')
+                        .update({
+                            status: 'returned',
+                            returned_at: new Date().toISOString(),
+                            return_lat: currentLat,
+                            return_lng: currentLng
+                        })
+                        .eq('id', currentRequestId);
+
+                    if (error) throw error;
+
+                    setCurrentRequestData(prev => ({
+                        ...prev,
                         status: 'returned',
-                        returned_at: new Date().toISOString(),
-                        return_lat: currentLat,
-                        return_lng: currentLng
-                    })
-                    .eq('id', currentRequestId);
+                        returned_at: new Date().toISOString()
+                    }));
 
-                if (error) throw error;
+                    localStorage.removeItem('current_request_id');
 
-                setCurrentRequestData(prev => ({
-                    ...prev,
-                    status: 'returned',
-                    returned_at: new Date().toISOString()
-                }));
-
-                alert('복귀 처리가 완료되었습니다.');
-
-            } catch (error) {
-
-                console.error(
-                    "Error updating document: ",
-                    error
-                );
-
-                alert(
-                    `오류가 발생했습니다: ${error.message}`
-                );
+                    alert('복귀 처리가 완료되었습니다.');
+                } catch (error) {
+                    console.error("Error updating document: ", error);
+                    alert(`오류가 발생했습니다: ${error.message}`);
+                }
+            },
+            (error) => {
+                console.error(error);
+                alert('위치 정보를 가져올 수 없습니다.\nGPS 권한을 허용해주세요.');
+            },
+            {
+                enableHighAccuracy: false,
+                timeout: 10000,
+                maximumAge: 0
             }
-        },
-
-       (error) => {
-
-    console.error(error);
-
-    alert(
-        '위치 정보를 가져올 수 없습니다.\nGPS 권한을 허용해주세요.'
-    );
-},
-
-        {
-            enableHighAccuracy: false,
-            timeout: 10000,
-            maximumAge: 0
-        }
-    );
-};
+        );
+    };
 
     // Admin Return Handler
     const handleAdminReturn = async (id) => {
@@ -336,13 +319,15 @@ const Outing = () => {
 
         try {
             if (!supabase) throw new Error("Supabase client not initialized");
+
             // Delete all rows
             const { error } = await supabase
                 .from('stay_requests')
                 .delete()
-                .neq('id', 0); // Delete all where id is not 0 (effectively all)
+                .not('id', 'is', null);
 
             if (error) throw error;
+
             alert('초기화되었습니다.');
             setOutings([]);
         } catch (error) {
@@ -379,7 +364,7 @@ const Outing = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold text-gray-800">
-                    {isAdmin ? '외출/외박 관리 (관리자)' : '외출/외박 신청'}
+                    {isAdmin ? '외출 관리 (관리자)' : '외출 신청'}
                 </h2>
                 <button
                     onClick={() => isAdmin ? setIsAdmin(false) : setShowAdminLogin(!showAdminLogin)}
@@ -411,8 +396,6 @@ const Outing = () => {
             {/* Admin View: Status List & Controls */}
             {isAdmin ? (
                 <div className="space-y-4">
-                 
-
                     <div className="space-y-3">
                         <h3 className="font-bold text-lg text-gray-800 px-1">현황 리스트</h3>
                         {loading ? (
@@ -426,51 +409,41 @@ const Outing = () => {
                                 <div key={item.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center">
                                     <div>
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className={`text-xs px-1.5 py-0.5 rounded ${item.type === '외박' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                                                {item.type}
+                                            <span className="text-xs px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">
+                                                외출
                                             </span>
-                                           <div className="flex flex-col">
-    <span className="text-xs text-nh-blue font-medium">
-        {item.course_name}
-    </span>
-
-    <span className="font-bold text-gray-800">
-        {item.name}
-
-        <span className="text-sm text-gray-500 ml-1">
-            ({item.student_id})
-        </span>
-    </span>
-</div>
+                                            <div className="flex flex-col">
+                                                <span className="text-xs text-nh-blue font-medium">
+                                                    {item.course_name}
+                                                </span>
+                                                <span className="font-bold text-gray-800">
+                                                    {item.name}
+                                                    <span className="text-sm text-gray-500 ml-1">
+                                                        ({item.student_id})
+                                                    </span>
+                                                </span>
+                                            </div>
                                         </div>
                                         <div className="text-xs text-gray-500">
                                             <span className="mr-2">📍 {item.destination}</span>
-                                            <span>🕒 {format(new Date(item.created_at), 'yyyy-MM-dd HH:mm')} 출발</span>
+                                            <span className="mr-2">🕒 {format(new Date(item.created_at), 'yyyy-MM-dd HH:mm')} 출발</span>
+                                            {item.return_time && (
+                                                <span>↩️ {format(new Date(item.return_time), 'MM-dd HH:mm')} 복귀예정</span>
+                                            )}
                                         </div>
                                     </div>
-
-                                    {item.status === 'active' ? (
-                                        <button
-                                            onClick={() => handleAdminReturn(item.id)}
-                                            className="text-nh-blue font-bold text-sm border border-nh-blue px-2 py-1 rounded hover:bg-blue-50"
-                                        >
-                                            외출중 (복귀처리)
-                                        </button>
-                                    ) : (
-                                        <div className="flex flex-col items-end">
-                                            <span className="flex items-center gap-1 text-green-600 text-sm font-medium">
-                                                <CheckCircle size={14} /> 복귀완료
-                                            </span>
-                                            <span className="text-xs text-gray-400">
-                                                {item.returned_at ? format(new Date(item.returned_at), 'yyyy-MM-dd HH:mm') : ''}
-                                            </span>
-                                        </div>
-                                    )}
+                                    <button
+                                        onClick={() => handleAdminReturn(item.id)}
+                                        className="text-nh-blue font-bold text-sm border border-nh-blue px-2 py-1 rounded hover:bg-blue-50"
+                                    >
+                                        외출중 (복귀처리)
+                                    </button>
                                 </div>
                             ))
                         )}
                     </div>
-   <div className="bg-red-50 border border-red-200 p-4 rounded-lg flex justify-between items-center">
+
+                    <div className="bg-red-50 border border-red-200 p-4 rounded-lg flex justify-between items-center">
                         <span className="font-bold text-red-700">관리자 기능</span>
                         <button
                             onClick={handleReset}
@@ -481,6 +454,8 @@ const Outing = () => {
                         </button>
                     </div>
                 </div>
+            ) : checkingRequest ? (
+                <Loading message="상태를 확인하는 중..." />
             ) : (
                 <>
                     {/* Student View */}
@@ -492,34 +467,31 @@ const Outing = () => {
                             </h3>
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-    <label className="block text-xs text-gray-500 mb-1">
-        과정 선택
-    </label>
+                                    <label className="block text-xs text-gray-500 mb-1">
+                                        과정 선택
+                                    </label>
+                                    <select
+                                        value={formData.course_name}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                course_name: e.target.value
+                                            })
+                                        }
+                                        className="w-full p-2 border border-gray-200 rounded focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none transition-colors bg-white"
+                                    >
+                                        <option value="">과정 선택</option>
+                                        {(settings?.course_list || '')
+                                            .split('\n')
+                                            .filter(Boolean)
+                                            .map((course, idx) => (
+                                                <option key={idx} value={course}>
+                                                    {course}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
 
-    <select
-        value={formData.course_name}
-        onChange={(e) =>
-            setFormData({
-                ...formData,
-                course_name: e.target.value
-            })
-        }
-        className="w-full p-2 border border-gray-200 rounded focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none transition-colors bg-white"
-    >
-        <option value="">
-            과정 선택
-        </option>
-
-        {(settings?.course_list || '')
-            .split('\n')
-            .filter(Boolean)
-            .map((course, idx) => (
-                <option key={idx} value={course}>
-                    {course}
-                </option>
-            ))}
-    </select>
-</div>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
                                         <label className="block text-xs text-gray-500 mb-1">교번</label>
@@ -544,22 +516,6 @@ const Outing = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs text-gray-500 mb-1">구분</label>
-                                    <div className="flex gap-2">
-                                        {['외출', '외박'].map((type) => (
-                                            <button
-                                                key={type}
-                                                type="button"
-                                                onClick={() => setFormData({ ...formData, type })}
-                                                className={`flex-1 py-2 rounded border ${formData.type === type ? 'bg-nh-blue text-white border-nh-blue' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
-                                            >
-                                                {type}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div>
                                     <label className="block text-xs text-gray-500 mb-1">목적지</label>
                                     <input
                                         type="text"
@@ -569,24 +525,25 @@ const Outing = () => {
                                         placeholder="예: OO시 OO동"
                                     />
                                 </div>
-<div>
-    <label className="block text-xs text-gray-500 mb-1">
-        복귀예정시간
-    </label>
 
-    <input
-        type="datetime-local"
-        value={formData.return_Time}
-        onChange={(e) =>
-            setFormData({
-                ...formData,
-                returnTime: e.target.value
-            })
-        }
-        className="w-full p-2 border border-gray-200 rounded focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none transition-colors"
-    />
-</div>
-                                {isTimeAllowed().allowed ? (
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">
+                                        복귀예정시간
+                                    </label>
+                                    <input
+                                        type="datetime-local"
+                                        value={formData.returnTime}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                returnTime: e.target.value
+                                            })
+                                        }
+                                        className="w-full p-2 border border-gray-200 rounded focus:border-nh-blue focus:ring-1 focus:ring-nh-blue outline-none transition-colors"
+                                    />
+                                </div>
+
+                                {timeStatus.allowed ? (
                                     <button
                                         type="submit"
                                         className="w-full bg-nh-green text-white py-3 rounded-lg font-bold hover:bg-green-600 transition-colors shadow-sm active:scale-[0.98]"
@@ -603,7 +560,7 @@ const Outing = () => {
                                             현재 신청 불가
                                         </button>
                                         <p className="text-xs text-red-500 text-center mt-2">
-                                            * 현재는 신청 가능 시간이 아닙니다 ({isTimeAllowed().start} ~ {isTimeAllowed().end})
+                                            * 현재는 신청 가능 시간이 아닙니다 ({timeStatus.start} ~ {timeStatus.end})
                                         </p>
                                     </div>
                                 )}
@@ -618,7 +575,7 @@ const Outing = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-bold text-gray-800 mb-1">
-                                        {currentRequestData?.type} 중입니다
+                                        외출 중입니다
                                     </h3>
                                     <p className="text-gray-500 text-sm">
                                         안전하게 다녀오세요!
@@ -640,6 +597,14 @@ const Outing = () => {
                                             {currentRequestData?.created_at && format(new Date(currentRequestData.created_at), 'yyyy-MM-dd HH:mm')}
                                         </span>
                                     </div>
+                                    {currentRequestData?.return_time && (
+                                        <div className="flex justify-between">
+                                            <span>복귀예정</span>
+                                            <span className="font-bold text-gray-800">
+                                                {format(new Date(currentRequestData.return_time), 'yyyy-MM-dd HH:mm')}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <button
