@@ -83,7 +83,7 @@ async function updateSettings() {
 
             const { error: uploadError } = await supabase.storage
                 .from('images')
-                .upload(filePath, imageFile);
+                .upload(filePath, imageFile, { cacheControl: '2592000' });
 
             if (uploadError) {
                 console.error(uploadError);
@@ -110,8 +110,7 @@ async function updateSettings() {
 
             const { error: uploadError } = await supabase.storage
                 .from('images')
-                .upload(filePath, facilityMapFile);
-
+              .upload(filePath, facilityMapFile, { cacheControl: '2592000' });
             if (uploadError) {
                 console.error(uploadError);
                 alert('조감도 업로드 실패');
@@ -143,7 +142,7 @@ async function updateSettings() {
 
                 const { error: uploadError } = await supabase.storage
                     .from('images')
-                    .upload(filePath, checkoutImgFiles[i]);
+                   .upload(filePath, checkoutImgFiles[i], { cacheControl: '2592000' });
 
                 if (uploadError) {
                     console.error(uploadError);
